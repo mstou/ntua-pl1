@@ -183,3 +183,47 @@ fun lottery file =
       )
       results
   end;
+
+  (* fun parseOutputFile file numOfLines =
+      let
+          fun readInt input =
+    	     Option.valOf (TextIO.scanStream (Int.scan StringCvt.DEC) input)
+
+        	val inStream = TextIO.openIn file
+
+        	fun readInts 0 acc = rev acc
+        	  | readInts i acc =
+              readInts
+                (i - 1)
+                ( ((readInt inStream),(readInt inStream)) :: acc )
+      in
+     	    readInts numOfLines []
+  end;
+
+  fun runTestcase n =
+    let
+      val inputFile = "testcases/lottery.in" ^ Int.toString(n)
+      val outputFile = "testcases/lottery.out" ^ Int.toString(n)
+
+      val numberOfQuerries = #3 (parse inputFile)
+
+      val producedResult = lottery inputFile
+      val expectedResult = parseOutputFile outputFile numberOfQuerries
+    in
+      producedResult = expectedResult
+    end;
+
+val testcases = [1,2,3,6,8,11,14,20,23]
+
+val passedAllTestcases =
+  foldl
+    (fn (t,acc) =>
+      let
+        val bestNumber = 73;
+      in
+        print ("Running testcase " ^ Int.toString(t) ^ "...\n");
+        if acc then (runTestcase t) else false
+      end
+    )
+    true
+    testcases; *)
