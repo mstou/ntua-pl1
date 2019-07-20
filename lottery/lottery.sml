@@ -26,7 +26,7 @@ fun parse file =
         (*Takes a list of lists of chars and returns a list of lists of integers*)
         fun charListToIntList l =
             map
-              (fn x => foldr
+              (fn x => foldl     (* we use foldl to also reverse the tickets *)
                         (fn (c,acc) =>
                             if c = #"\n"
                             then acc
@@ -42,6 +42,12 @@ fun parse file =
    	    (k, n, q, tickets, querries)
 end;
 
+(* === Helping functions === *)
+
+(* computes a ^ n mod p. The result should fit in an int *)
+fun pow a n p =
+  Int.fromLarge (IntInf.pow(a,n) mod (Int.toLarge p))
+(* ========================= *)
 
 structure S = BinaryMapFn(
   struct
@@ -55,6 +61,7 @@ datatype trie = empty | node of int * ( (int*trie) S.map ) * int
 (* childrenMap:  childrenValue => (ticketsHanging, trie) *)
 
 val root = node(~1,S.empty,0);
+val p = 1000000007;
 
 (* insert a ticket (given as a list of ints) in the trie t *)
 fun insert t [] = t
@@ -90,9 +97,88 @@ fun insert t [] = t
       node (a, newMap, n+1)
     end;
 
+(* insert a list of tickets in a trie *)
+fun insertTickets t l =
+  foldl
+    (fn (x,acc) => insert acc x)
+    t
+    l
+
 (* A function to get the ChildMap of a trie node *)
 fun extractMap empty = S.empty
   | extractMap (node(_,s,_)) = s
 
+(* returns the sub-trie with root value x and the amount of tickets hanging*)
+fun findChild empty _ = (0,empty)
+  | findChild (node(_,s,_)) x =
+    let
+      val child = S.find(s,x);
+    in
+      if isSome child
+      then valOf child
+      else (0,empty)
+    end
 
-val a = parse "testcases/lottery.in2";
+(* query the trie for a winning ticket *)
+(* return the number of tickets winning & the total amount *)
+
+fun query empty _ _ = (0,0)
+  | query (node(_,_,n)) [] m =
+    let
+      val term1 = Int.toLarge((pow 2 m p) - 1)
+      val term2 = Int.toLarge(n)
+      val termMod = (term1 * term2) mod (Int.toLarge p)
+    in
+      (n,Int.fromLarge termMod)
+    end
+  | query (node(currNode,s,n)) (x::xs) m =
+    let
+      val child = S.find(s,x)
+
+      val childQuerry =
+        if isSome child
+        then (query (#2 (valOf child)) xs (m+1))
+        else (0,0)
+
+      val remainingTickets = (n - (#1 childQuerry))
+      val remLarge = Int.toLarge(remainingTickets) * Int.toLarge((pow 2 m p) - 1)
+      val remModulo = remLarge mod (Int.toLarge p)
+
+      val money =
+        Int.fromLarge(remModulo) + (#2 childQuerry)
+
+      val returningTickets =
+        if m = 0 (*if we are at trie's root*)
+        then #1 (childQuerry)
+        else n
+    in
+      (returningTickets,money)
+    end
+
+fun calculateQuerries t q =
+  map (fn x => query t x 0) q
+
+fun lottery file =
+  let
+    val a = parse file;
+    val k = #1 a;
+    val n = #2 a;
+    val q = #3 a;
+    val tickets = #4 a;
+    val querries = #5 a;
+
+    val fullTrie = insertTickets root tickets;
+    val results = calculateQuerries fullTrie querries;
+
+  in
+    map
+      (fn x =>
+          let
+            val resString = Int.toString(#1 x) ^ " " ^ Int.toString(#2 x) ^ "\n";
+          in
+            print resString;
+            x
+          end
+      )
+      results
+  end;
