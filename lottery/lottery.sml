@@ -43,9 +43,10 @@ fun parse file =
 end;
 
 (* === Helping functions === *)
+val p = 1000000007;
 
 (* computes a ^ n mod p. The result should fit in an int *)
-fun pow a n p =
+fun pow a n =
   Int.fromLarge (IntInf.pow(a,n) mod (Int.toLarge p))
 (* ========================= *)
 
@@ -61,7 +62,6 @@ datatype trie = empty | node of int * ( (int*trie) S.map ) * int
 (* childrenMap:  childrenValue => (ticketsHanging, trie) *)
 
 val root = node(~1,S.empty,0);
-val p = 1000000007;
 
 (* insert a ticket (given as a list of ints) in the trie t *)
 fun insert t [] = t
@@ -125,7 +125,7 @@ fun findChild empty _ = (0,empty)
 fun query empty _ _ = (0,0)
   | query (node(_,_,n)) [] m =
     let
-      val term1 = Int.toLarge((pow 2 m p) - 1)
+      val term1 = Int.toLarge((pow 2 m) - 1)
       val term2 = Int.toLarge(n)
       val termMod = (term1 * term2) mod (Int.toLarge p)
     in
@@ -141,11 +141,12 @@ fun query empty _ _ = (0,0)
         else (0,0)
 
       val remainingTickets = (n - (#1 childQuerry))
-      val remLarge = Int.toLarge(remainingTickets) * Int.toLarge((pow 2 m p) - 1)
+      val remLarge = Int.toLarge(remainingTickets) * Int.toLarge((pow 2 m) - 1)
       val remModulo = remLarge mod (Int.toLarge p)
+      val allMoneyLarge = (remModulo + Int.toLarge(#2 childQuerry)) mod (Int.toLarge p)
 
       val money =
-        Int.fromLarge(remModulo) + (#2 childQuerry)
+        Int.fromLarge(allMoneyLarge)
 
       val returningTickets =
         if m = 0 (*if we are at trie's root*)
