@@ -12,29 +12,19 @@ read_line(Stream, L) :-
     atomic_list_concat(Atoms, ' ', Atom),
     maplist(atom_number, Atoms, L).
 
-emptyList([]).
-emptyList([_|_]) :- false.
-
-% findNewStart(Start,FreqMap,Colors,NewStart,NewFreqMap,DroppedColors)
-findNewStart(Start,FreqMap,[_],NewStart,NewFreqMap,DroppedColors) :-
-  NewStart = Start,
-  NewFreqMap = FreqMap,
-  DroppedColors = [].
-
-findNewStart(Start,FreqMap,[H1|L],NewStart,NewFreqMap,DroppedColors) :-
-  get_assoc(H1,FreqMap,HeadFrequency),
+% findNewStart(Start,FreqMap,Colors,NewStart,NewFreqMap)
+findNewStart(Start,FreqMap,Colors,NewStart,NewFreqMap) :-
+  get_assoc(Start,Colors,ColorAtStart),
+  get_assoc(ColorAtStart,FreqMap,ColorFreq),
   (
-    HeadFrequency > 1 ->
-      NewFreq is HeadFrequency - 1,
+    ColorFreq > 1 ->
+      NewFreq is ColorFreq - 1,
       Start_ is Start + 1,
-      put_assoc(H1,FreqMap,NewFreq,FreqMap_),
-      findNewStart(Start_,FreqMap_,L,NewStart,NewFreqMap,RestDropped),
-      append([H1],RestDropped,DroppedColors)
+      put_assoc(ColorAtStart,FreqMap,NewFreq,FreqMap_),
+      findNewStart(Start_,FreqMap_,Colors,NewStart,NewFreqMap)
       ;
-
       NewStart is Start,
-      NewFreqMap = FreqMap,
-      DroppedColors = []
+      NewFreqMap = FreqMap
   ).
 
   % findStart test:
@@ -81,6 +71,10 @@ loop(Start,End,[H1|L1],[H2|L2],FreqMap,ColorsUsed,AllColors,BestRes,Answer) :-
       NewBestRes is BestRes
   ),
   loop(NewStart,NewEnd,NewWindowColors,L2,NewFreqMap,NewColorsUsed,AllColors,NewBestRes,Answer).
+
+listToAssoc(L,X) :-
+  empty_assoc(Y),
+  listToAssoc(L,0,Y,X).
 
 listToAssoc([],_,X,Y) :- X = Y.
 
