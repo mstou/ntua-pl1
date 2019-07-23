@@ -12,81 +12,76 @@ read_line(Stream, L) :-
     atomic_list_concat(Atoms, ' ', Atom),
     maplist(atom_number, Atoms, L).
 
-emptyList([]).
-emptyList([_|_]) :- false.
-
-% findNewStart(Start,FreqMap,Colors,NewStart,NewFreqMap,DroppedColors)
-findNewStart(Start,FreqMap,[_],NewStart,NewFreqMap,DroppedColors) :-
-  NewStart = Start,
-  NewFreqMap = FreqMap,
-  DroppedColors = [].
-
-findNewStart(Start,FreqMap,[H1|L],NewStart,NewFreqMap,DroppedColors) :-
-  get_assoc(H1,FreqMap,HeadFrequency),
+% findNewStart(Start,FreqMap,Colors,NewStart,NewFreqMap)
+findNewStart(Start,FreqMap,Colors,NewStart,NewFreqMap) :-
+  get_assoc(Start,Colors,ColorAtStart),
+  get_assoc(ColorAtStart,FreqMap,ColorFreq),
   (
-    HeadFrequency > 1 ->
-      NewFreq is HeadFrequency - 1,
+    ColorFreq > 1 ->
+      NewFreq is ColorFreq - 1,
       Start_ is Start + 1,
-      put_assoc(H1,FreqMap,NewFreq,FreqMap_),
-      findNewStart(Start_,FreqMap_,L,NewStart,NewFreqMap,RestDropped),
-      append([H1],RestDropped,DroppedColors)
+      put_assoc(ColorAtStart,FreqMap,NewFreq,FreqMap_),
+      findNewStart(Start_,FreqMap_,Colors,NewStart,NewFreqMap)
       ;
-
       NewStart is Start,
-      NewFreqMap = FreqMap,
-      DroppedColors = []
+      NewFreqMap = FreqMap
   ).
 
-  % findStart test:
-  % empty_assoc(X),
-  % put_assoc(1,X,4,X1),
-  % put_assoc(4,X1,2,X2),
-  % put_assoc(3,X2,2,X3),
-  % put_assoc(2,X3,1,X4),
-  % findNewStart(0,X4,[1,1,1,4,3,1,3,2,4],NewStart,NewFreqMap,DroppedColors).
+% loop(Start,End,Colors,FreqMap,ColorsUsed,K,N,PreviousBest,Answer)
+loop(_,End,_,_,_,_,N,BestResult,Answer) :-
+  End =:= N - 1,
+  Answer is BestResult.
 
-% loop(Start,End,WindowColors,ColorsAfter,FreqMap,ColorsUsed,K,PreviousBest,BestResult)
-loop(_,_,_,[],_,_,_,BestResult,Answer) :-
-  Answer is BestResult,
-  !.
-
-loop(_,_,_,[_|_],_,_,1,_,Answer) :-
+loop(_,_,_,_,_,1,N,_,Answer) :-
+  N >= 1,
   Answer is 1.
 
-loop(Start,End,[],[H2|L2],FreqMap,ColorsUsed,AllColors,BestRes,Answer) :-
-  put_assoc(H2,FreqMap,1,NewFreqMap),
+loop(-1,-1,Colors,FreqMap,ColorsUsed,AllColors,N,BestRes,Answer) :-
+  get_assoc(0,Colors,FirstColor),
+  put_assoc(FirstColor,FreqMap,1,NewFreqMap),
   NewColorsUsed is ColorsUsed + 1,
-  loop(Start,End,[H2],L2,NewFreqMap,NewColorsUsed,AllColors,BestRes,Answer).
+  loop(0,0,Colors,NewFreqMap,NewColorsUsed,AllColors,N,BestRes,Answer).
 
-% When starting the predicate, End is exaclty at the last element of L1
-% When exiting it is at H2
-loop(Start,End,[H1|L1],[H2|L2],FreqMap,ColorsUsed,AllColors,BestRes,Answer) :-
+% When starting the predicate, we know the best result for all the
+% windows ending up to (and including) End.
+loop(Start,End,Colors,FreqMap,ColorsUsed,AllColors,N,BestRes,Answer) :-
+  NewEnd is End + 1,
+  get_assoc(NewEnd,Colors,NewColor),
   (
-    get_assoc(H2,FreqMap,EndFreq) ->
+    get_assoc(NewColor,FreqMap,EndFreq) ->
       NewColorsUsed is ColorsUsed,
       NewEndFreq is EndFreq +1,
-      put_assoc(H2,FreqMap,NewEndFreq,FreqMap_)
+      put_assoc(NewColor,FreqMap,NewEndFreq,FreqMap_)
       ;
       NewColorsUsed is ColorsUsed + 1,
-      put_assoc(H2,FreqMap,1,FreqMap_)
+      put_assoc(NewColor,FreqMap,1,FreqMap_)
   ),
-  NewEnd is End + 1,
-  append([H1|L1],[H2],WindowColors),
-  findNewStart(Start,FreqMap_,WindowColors,NewStart,NewFreqMap,DroppedColors),
-  append(DroppedColors,NewWindowColors,WindowColors),
+  findNewStart(Start,FreqMap_,Colors,NewStart,NewFreqMap),
   (
     NewColorsUsed =:= AllColors ->
       NewBestRes is min(BestRes,NewEnd-NewStart+1)
       ;
       NewBestRes is BestRes
   ),
-  loop(NewStart,NewEnd,NewWindowColors,L2,NewFreqMap,NewColorsUsed,AllColors,NewBestRes,Answer).
+  loop(NewStart,NewEnd,Colors,NewFreqMap,NewColorsUsed,AllColors,N,NewBestRes,Answer).
+
+listToAssoc(L,X) :-
+  empty_assoc(Y),
+  listToAssoc(L,0,Y,X).
+
+listToAssoc([],_,X,Y) :- X = Y.
+
+listToAssoc([H|L],N,X,Y) :-
+  put_assoc(N,X,H,X1),
+  NewIndex is N+1,
+  listToAssoc(L,NewIndex,X1,Y).
 
 colors(File,Answer) :-
   read_input(File,N,K,C),
   BestResult is N+1,
-  empty_assoc(X),
-  loop(0,0,[],C,X,0,K,BestResult,Ans),
+  listToAssoc(C,X),
+  empty_assoc(Y),
+  loop(-1,-1,X,Y,0,K,N,BestResult,Ans),
   (
     Ans =:= BestResult ->
       Answer is 0
