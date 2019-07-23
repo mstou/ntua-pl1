@@ -12,6 +12,9 @@ read_line(Stream, L) :-
     atomic_list_concat(Atoms, ' ', Atom),
     maplist(atom_number, Atoms, L).
 
+emptyList([]).
+emptyList([_|_]) :- false.
+
 % findNewStart(Start,FreqMap,Colors,NewStart,NewFreqMap,DroppedColors)
 findNewStart(Start,FreqMap,[_],NewStart,NewFreqMap,DroppedColors) :-
   NewStart = Start,
@@ -43,16 +46,6 @@ findNewStart(Start,FreqMap,[H1|L],NewStart,NewFreqMap,DroppedColors) :-
   % findNewStart(0,X4,[1,1,1,4,3,1,3,2,4],NewStart,NewFreqMap,DroppedColors).
 
 % loop(Start,End,WindowColors,ColorsAfter,FreqMap,ColorsUsed,K,PreviousBest,BestResult)
-
-% loop(Start,End,[H1|L],[],Freq,ColorsUsed,AllColors,BestRes,Answer) :-
-%   findStart(Start,Freq,[H1|L],NewStart,_,_),
-%   (
-%     ColorsUsed =:= AllColors ->
-%       Answer is min(BestRes,End-NewStart+1)
-%       ;
-%       Answer is BestRes
-%   ).
-
 loop(_,_,_,[],_,_,_,BestResult,Answer) :-
   Answer is BestResult,
   !.
@@ -61,11 +54,12 @@ loop(_,_,_,[_|_],_,_,1,_,Answer) :-
   Answer is 1.
 
 loop(Start,End,[],[H2|L2],FreqMap,ColorsUsed,AllColors,BestRes,Answer) :-
-  NewEnd is End + 1,
   put_assoc(H2,FreqMap,1,NewFreqMap),
   NewColorsUsed is ColorsUsed + 1,
-  loop(Start,NewEnd,[H2],L2,NewFreqMap,NewColorsUsed,AllColors,BestRes,Answer).
+  loop(Start,End,[H2],L2,NewFreqMap,NewColorsUsed,AllColors,BestRes,Answer).
 
+% When starting the predicate, End is exaclty at the last element of L1
+% When exiting it is at H2
 loop(Start,End,[H1|L1],[H2|L2],FreqMap,ColorsUsed,AllColors,BestRes,Answer) :-
   (
     get_assoc(H2,FreqMap,EndFreq) ->
@@ -88,6 +82,14 @@ loop(Start,End,[H1|L1],[H2|L2],FreqMap,ColorsUsed,AllColors,BestRes,Answer) :-
   ),
   loop(NewStart,NewEnd,NewWindowColors,L2,NewFreqMap,NewColorsUsed,AllColors,NewBestRes,Answer).
 
-% loop test
-% empty_assoc(X),
-% loop(0,0,[],[1,3,1,3,1,3,3,2,2,1],X3,0,3,11,Answer).
+colors(File,Answer) :-
+  read_input(File,N,K,C),
+  BestResult is N+1,
+  empty_assoc(X),
+  loop(0,0,[],C,X,0,K,BestResult,Ans),
+  (
+    Ans =:= BestResult ->
+      Answer is 0
+      ;
+      Answer is Ans
+  ).
