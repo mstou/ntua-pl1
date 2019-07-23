@@ -82,6 +82,13 @@ loop(Start,End,[H1|L1],[H2|L2],FreqMap,ColorsUsed,AllColors,BestRes,Answer) :-
   ),
   loop(NewStart,NewEnd,NewWindowColors,L2,NewFreqMap,NewColorsUsed,AllColors,NewBestRes,Answer).
 
+listToAssoc([],_,X,Y) :- X = Y.
+
+listToAssoc([H|L],N,X,Y) :-
+  put_assoc(N,X,H,X1),
+  NewIndex is N+1,
+  listToAssoc(L,NewIndex,X1,Y).
+
 colors(File,Answer) :-
   read_input(File,N,K,C),
   BestResult is N+1,
