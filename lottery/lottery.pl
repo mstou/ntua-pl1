@@ -23,7 +23,10 @@ read_ticket(Stream, T) :-
 
 % read_tickets(Stream, Acc, N, Tickets)
 read_tickets(_, Acc, 0, Tickets) :-
-    reverse(Acc,Tickets).
+    % reverse(Acc,Tickets).
+    Tickets = Acc.
+    % The tickets and querries are stored in reverse order
+    % They will be reversed again when running the querries
 
 read_tickets(Stream, Acc, N, Tickets) :-
     N > 0,
@@ -66,3 +69,54 @@ insert(trie(X,Map,N), [H|L], T2) :-
   ),
   NewN is N+1,
   T2 = trie(X,NewMap,NewN).
+
+insertList(T1,[],T) :-
+  T = T1.
+
+insertList(T1,[H|L],T) :-
+  insert(T1,H,T2),
+  insertList(T2,L,T).
+
+query(empty,_,_,(Tickets,Money)) :-
+  Tickets is 0,
+  Money is 0.
+
+query(trie(_,_,N),[],M,(Tickets,Money)) :-
+  Tickets is N,
+  Money is (N * (((2 ** M) - 1) mod 1000000007)) mod 1000000007.
+
+query(trie(_,Map,N),[H|L],M,(Tickets,Money)) :-
+  (
+    get_assoc(H,Map,Val) ->
+      (ChildTickets,ChildTrie) = Val,
+      NewM is M+1,
+      query(ChildTrie,L,NewM,(_,ChildMoney)),
+      RemainingTickets is N - ChildTickets
+      ;
+
+      RemainingTickets is N,
+      ChildMoney is 0,
+      ChildTickets is 0
+  ),
+
+  (
+    M =:= 0 ->
+      Tickets is ChildTickets
+      ;
+      Tickets is N
+  ),
+  CurrNodeMoney is (RemainingTickets * (((2 ** M) - 1) mod 1000000007)) mod 1000000007,
+  Money is (CurrNodeMoney + ChildMoney) mod 1000000007.
+
+runQuerries(_,[],Results,Acc) :-
+  Results = Acc.
+
+runQuerries(T,[H|L],Results,Acc) :-
+  query(T,H,0,(Tickets,Money)),
+  runQuerries(T,L,Results,[[Tickets,Money]|Acc]).
+
+lottery(File,L) :-
+  read_input(File,_,_,_,Tickets,Winning),
+  insertList(trie(-1,t,0),Tickets,Trie),
+  runQuerries(Trie,Winning,L,[]),
+  !.
