@@ -120,3 +120,40 @@ lottery(File,L) :-
   insertList(trie(-1,t,0),Tickets,Trie),
   runQuerries(Trie,Winning,L,[]),
   !.
+
+% ========== Runing Testcases ==========
+% read_results(File,N,L) :-
+%   open(File, read, Stream),
+%   read_result(Stream,N,L,[]).
+%
+% read_result(_,0,L,Acc) :-
+%   reverse(L,Acc).
+%
+% read_result(Stream,N,L,Acc) :-
+%   read_line(Stream, R),
+%   Remaining is N-1,
+%   read_result(Stream,Remaining,L,[R|Acc]).
+%
+% listEqual([],[]).
+% listEqual([[T1,M1]],[[T2,M2]]) :-
+%   T1 =:= T2,
+%   M1 =:= M2.
+% listEqual([[T1,M1]|L1],[[T2,M2]|L2]) :-
+%   T1 =:= T2,
+%   M1 =:= M2,
+%   listEqual(L1,L2).
+%
+% evaluate_testcase(TestNum,Result) :-
+%   string_concat("testcases/lottery.in",TestNum,InputFile),
+%   string_concat("testcases/lottery.out",TestNum,OutputFile),
+%   read_input(InputFile,_,_,Q,Tickets,Winning),
+%   insertList(trie(-1,t,0),Tickets,Trie),
+%   runQuerries(Trie,Winning,L,[]),
+%   read_results(OutputFile,Q,R),
+%   (
+%     listEqual(L,R) ->
+%       Result = "+++ OK!"
+%       ;
+%       Result = "--- Testcase Failed!"
+%   ),
+%   !.
