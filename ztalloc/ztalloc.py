@@ -87,8 +87,5 @@ def query(Q):
     return "IMPOSSIBLE"
 
 
-# for q in Q:
-#     print(query(q),end='\n')
-print(query([0, 0, 42, 42]))
-print(query([0, 0, 73, 73]))
-# print(query([362, 362, 960244, 961098]))
+for q in Q:
+    print(query(q),end='\n')
