@@ -26,17 +26,17 @@ def findNeighbors(state):
     L1 = h(L)
     R1 = h(R)
     key1 = key(L1,R1)
-    if valid(L1) and valid(R1) and not key1 in father:
+    if valid(L1) and valid(R1) and key1 not in father:
         father[key1] = ["h",L,R]
-    result.append([L1,R1])
+        result.append([L1,R1])
 
     # Check t move
     L2 = t(L)
     R2 = t(R)
     key2 = key(L2,R2)
-    if valid(L2) and valid(R2) and not key2 in father:
+    if valid(L2) and valid(R2) and key2 not in father:
         father[key2] = ["t",L,R]
-    result.append([L2,R2])
+        result.append([L2,R2])
 
     return result
 
