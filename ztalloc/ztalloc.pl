@@ -45,6 +45,7 @@ fifo_insertList(Q1,[],Q2) :-
 
 fifo_insertList(Q1,[H|L],Q2) :-
   fifo_insert(Q1,H,Q_),
+  !,
   fifo_insertList(Q_,L,Q2).
 
 % fifo_pop(Q1,X,Q2)
@@ -156,6 +157,7 @@ bfsLoop(Q,(Lout,Rout),Parent,Answer) :-
       findPath(Node,NewParent,[],Answer)
       ;
       fifo_insertList(Q_,Neighbors,NewQueue),
+      !,
       bfsLoop(NewQueue,(Lout,Rout),NewParent,Answer)
   ).
 
@@ -165,6 +167,7 @@ runQuerries([],Acc,Answer) :-
 runQuerries([H|L],Acc,Answer) :-
   [Lin,Rin,Lout,Rout] = H,
   bfs(Lin,Rin,Lout,Rout,Ans),
+  !,
   runQuerries(L,[Ans|Acc],Answer).
 
 ztalloc(File,Answer) :-
