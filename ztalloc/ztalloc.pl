@@ -101,6 +101,20 @@ findNeighbors(L,R,Parent,Neighbors,NewParent) :-
       NewParent = Parent_
   ).
 
+checkForAnswer([],_,Ans,A) :-
+  A = -1,
+  Ans = (-73,-73).
+
+checkForAnswer([H|L],(Lout,Rout),Ans,A) :-
+  (L1,R1) = H,
+  (
+    isAnswer(L1,R1,Lout,Rout) ->
+      Ans = H,
+      A = 1
+      ;
+      checkForAnswer(L,(Lout,Rout),Ans,A)
+  ).
+
 isAnswer(Lin,Rin,Lout,Rout) :-
   Lin >= Lout,
   Rin =< Rout.
@@ -135,11 +149,12 @@ bfsLoop(Q,_,_,Answer) :-
 
 bfsLoop(Q,(Lout,Rout),Parent,Answer) :-
   fifo_pop(Q,(L,R),Q_),
+  findNeighbors(L,R,Parent,Neighbors,NewParent),
+  checkForAnswer(Neighbors,(Lout,Rout),Node,FoundAnswer),
   (
-    isAnswer(L,R,Lout,Rout) ->
-      findPath((L,R),Parent,[],Answer)
+    FoundAnswer =:= 1 ->
+      findPath(Node,NewParent,[],Answer)
       ;
-      findNeighbors(L,R,Parent,Neighbors,NewParent),
       fifo_insertList(Q_,Neighbors,NewQueue),
       bfsLoop(NewQueue,(Lout,Rout),NewParent,Answer)
   ).
