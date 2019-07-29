@@ -124,18 +124,22 @@ bfs(Lin,Rin,Lout,Rout,Answer) :-
       ;
       empty_assoc(X),
       put_assoc((Lin,Rin),X,("start",-73,-73),Parent),
-      bfsLoop([(Lin,Rin)],(Lout,Rout),Parent,Answer)
+      fifo_empty(Q),
+      fifo_insert(Q,(Lin,Rin),Q1),
+      bfsLoop(Q1,(Lout,Rout),Parent,Answer)
   ).
 
-bfsLoop([],_,_,Answer) :-
+bfsLoop(Q,_,_,Answer) :-
+  fifo_isEmpty(Q),
   Answer = "IMPOSSIBLE".
 
-bfsLoop([(L,R)|Queue],(Lout,Rout),Parent,Answer) :-
+bfsLoop(Q,(Lout,Rout),Parent,Answer) :-
+  fifo_pop(Q,(L,R),Q_),
   (
     isAnswer(L,R,Lout,Rout) ->
       findPath((L,R),Parent,[],Answer)
       ;
       findNeighbors(L,R,Parent,Neighbors,NewParent),
-      append(Queue,Neighbors,NewQueue),
+      fifo_insertList(Q_,Neighbors,NewQueue),
       bfsLoop(NewQueue,(Lout,Rout),NewParent,Answer)
   ).
