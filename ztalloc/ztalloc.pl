@@ -57,3 +57,30 @@ findNeighbors(L,R,Parent,Neighbors,NewParent) :-
       Neighbors = Res1,
       NewParent = Parent_
   ).
+
+isAnswer(Lin,Rin,Lout,Rout) :-
+  Lin >= Lout,
+  Rin =< Rout.
+
+bfs(Lin,Rin,Lout,Rout,Answer) :-
+  (
+    isAnswer(Lin,Rin,Lout,Rout) ->
+      Answer = "EMPTY"
+      ;
+      empty_assoc(X),
+      put_assoc((Lin,Rin),X,("start",-73,-73),Parent),
+      bfsLoop([(Lin,Rin)],(Lout,Rout),Parent,Answer)
+  ).
+
+bfsLoop([],_,_,Answer) :-
+  Answer = "IMPOSSIBLE".
+
+bfsLoop([(L,R)|Queue],(Lout,Rout),Parent,Answer) :-
+  (
+    isAnswer(L,R,Lout,Rout) ->
+      Answer = "1"
+      ;
+      findNeighbors(L,R,Parent,Neighbors,NewParent),
+      append(Queue,Neighbors,NewQueue),
+      bfsLoop(NewQueue,(Lout,Rout),NewParent,Answer)
+  ).
