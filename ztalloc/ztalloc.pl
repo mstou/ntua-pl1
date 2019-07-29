@@ -15,7 +15,7 @@ read_line(Stream, L) :-
 
 read_querries(_,0,Q,Acc) :-
     Q = Acc.
-    
+
 read_querries(Stream,N,Q,Acc) :-
     read_line(Stream, L),
     QuerriesLeft is N-1,
@@ -151,3 +151,8 @@ runQuerries([H|L],Acc,Answer) :-
   [Lin,Rin,Lout,Rout] = H,
   bfs(Lin,Rin,Lout,Rout,Ans),
   runQuerries(L,[Ans|Acc],Answer).
+
+ztalloc(File,Answer) :-
+  read_input(File,_,Q),
+  runQuerries(Q,[],Answer),
+  !.
