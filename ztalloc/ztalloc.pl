@@ -62,6 +62,18 @@ isAnswer(Lin,Rin,Lout,Rout) :-
   Lin >= Lout,
   Rin =< Rout.
 
+findPath((-73,-73),_,Acc,Answer) :-
+  atomic_list_concat(Acc,Answer).
+
+findPath((L,R),Parent,Acc,Answer) :-
+  get_assoc((L,R),Parent,(Move,ParentL,ParentR)),
+  (
+    ParentL =:= -73 ->
+      findPath((-73,-73),Parent,Acc,Answer)
+      ;
+      findPath((ParentL,ParentR),Parent,[Move|Acc],Answer)
+  ).
+
 bfs(Lin,Rin,Lout,Rout,Answer) :-
   (
     isAnswer(Lin,Rin,Lout,Rout) ->
@@ -78,7 +90,7 @@ bfsLoop([],_,_,Answer) :-
 bfsLoop([(L,R)|Queue],(Lout,Rout),Parent,Answer) :-
   (
     isAnswer(L,R,Lout,Rout) ->
-      Answer = "1"
+      findPath((L,R),Parent,[],Answer)
       ;
       findNeighbors(L,R,Parent,Neighbors,NewParent),
       append(Queue,Neighbors,NewQueue),
