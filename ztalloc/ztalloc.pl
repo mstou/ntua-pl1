@@ -21,6 +21,49 @@ read_querries(Stream,N,Q,Acc) :-
     QuerriesLeft is N-1,
     read_querries(Stream,QuerriesLeft,Q,[L|Acc]).
 
+% FIFO Queue implementation
+fifo_empty(Q) :-
+  empty_assoc(X),
+  Q = (-1,-1,X).
+
+% fifo_insert(Q1,X,Q2)
+% Makes a new FIFO Queue Q2, which is Q1 with X inserted
+fifo_insert((-1,-1,A),X,Q2) :-
+  put_assoc(0,A,X,NewTree),
+  Q2 = (0,1,NewTree),
+  !.
+
+fifo_insert((Head,Tail,T),X,Q2) :-
+  NewTail is Tail + 1,
+  put_assoc(Tail,T,X,NewT),
+  Q2 = (Head,NewTail,NewT),
+  !.
+
+% fifo_insertList(Q1,L,Q2)
+fifo_insertList(Q1,[],Q2) :-
+  Q2 = Q1.
+
+fifo_insertList(Q1,[H|L],Q2) :-
+  fifo_insert(Q1,H,Q_),
+  fifo_insertList(Q_,L,Q2).
+
+% fifo_pop(Q1,X,Q2)
+% Pops an item from Q1.
+% X is the item popped and Q2 is the remaining queue
+% Returns false if Q1 is empty
+fifo_pop((Head,Tail,T),X,Q2) :-
+  Head =\= Tail,
+  del_assoc(Head,T,X,NewT),
+  NewHead is Head + 1,
+  Q2 = (NewHead,Tail,NewT),
+  !.
+
+% fifo_isEmpty(Q)
+% Is true if Q is empty
+fifo_isEmpty((Head,Tail,_)) :-
+  Head =:= Tail.
+
+% =========================
 isValid(X) :-
   X >= 0,
   X =< 999999.
