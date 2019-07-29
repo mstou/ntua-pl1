@@ -174,3 +174,52 @@ ztalloc(File,Answer) :-
   read_input(File,_,Q),
   runQuerries(Q,[],Answer),
   !.
+
+% % ================ Tests ================
+% read_test_output(File,N,Answers) :-
+%   open(File,read,Stream),
+%   read_output_lines(Stream,N,[],Answers).
+%
+% read_output_line(Stream,L) :-
+%   read_line_to_codes(Stream,Line),
+%   atom_codes(L,Line).
+%
+% read_output_lines(_,0,Acc,Answers) :-
+%   reverse(Acc,Answers).
+%
+% read_output_lines(Stream,N,Acc,Answers) :-
+%   Remaining is N-1,
+%   read_output_line(Stream,L),
+%   read_output_lines(Stream,Remaining,[L|Acc],Answers).
+%
+% listEqual([],[]).
+% listEqual([H1|L1],[H2|L2]) :-
+%   (
+%    H1 = H2 ->
+%      H1 = H2
+%      ;
+%      writeln(H1),
+%      writeln(H2)
+%   ),
+%   listEqual(L1,L2).
+%
+% evaluate_testcase(TestNum) :-
+%   string_concat("testcases/ztalloc.in",TestNum,InputFile),
+%   string_concat("testcases/ztalloc.out",TestNum,OutputFile),
+%   read_input(InputFile,N,Q),
+%   statistics(walltime, [ _ | [_]]),
+%   runQuerries(Q,[],Answer),
+%   statistics(walltime, [ _ | [ExecutionTime]]),
+%   read_test_output(OutputFile,N,ExpectedAnswer),
+%   (
+%     listEqual(Answer,ExpectedAnswer) ->
+%       writeln("+++ OK!")
+%       ;
+%       writeln("--- Testcase Failed!")
+%   ),
+%   write('Execution took '),
+%   write(ExecutionTime),
+%   writeln(' ms.'),
+%   !.
+%
+% % =======================================
