@@ -14,8 +14,8 @@ read_line(Stream, L) :-
     maplist(atom_number, Atoms, L).
 
 read_querries(_,0,Q,Acc) :-
-    reverse(Q,Acc).
-
+    Q = Acc.
+    
 read_querries(Stream,N,Q,Acc) :-
     read_line(Stream, L),
     QuerriesLeft is N-1,
@@ -143,3 +143,11 @@ bfsLoop(Q,(Lout,Rout),Parent,Answer) :-
       fifo_insertList(Q_,Neighbors,NewQueue),
       bfsLoop(NewQueue,(Lout,Rout),NewParent,Answer)
   ).
+
+runQuerries([],Acc,Answer) :-
+  Answer = Acc.
+
+runQuerries([H|L],Acc,Answer) :-
+  [Lin,Rin,Lout,Rout] = H,
+  bfs(Lin,Rin,Lout,Rout,Ans),
+  runQuerries(L,[Ans|Acc],Answer).
