@@ -1,18 +1,34 @@
 import java.util.*;
+import java.io.*;
 
 public class Ztalloc {
 
   public static void main(String args[]) {
-    BFSolver solver = new BFSolver();
-    ZtallocState initial = new ZtallocState(0,0,42,42,null);
-    ZtallocState result = solver.solve(initial);
+    try {
+      Scanner scanner = new Scanner(new File(args[0]));
+      int N = scanner.nextInt();
 
-    if(result == initial){
-      System.out.println("EMPTY");
-    } else if (result == null){
-      System.out.println("IMPOSSIBLE");
-    } else {
-      System.out.println(getSolution(result));
+      for(int i = 0; i < N; i++ ){
+        int Lin = scanner.nextInt();
+        int Rin = scanner.nextInt();
+        int Lout = scanner.nextInt();
+        int Rout = scanner.nextInt();
+
+        BFSolver solver = new BFSolver();
+        ZtallocState initial = new ZtallocState(Lin,Rin,Lout,Rout,null);
+        ZtallocState result = solver.solve(initial);
+
+        if(result == initial){
+          System.out.println("EMPTY");
+        } else if (result == null){
+          System.out.println("IMPOSSIBLE");
+        } else {
+          System.out.println(getSolution(result));
+        }
+      }
+    }
+    catch (FileNotFoundException e){
+      System.out.println("Please provide an input file.");
     }
   }
 
