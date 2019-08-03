@@ -1,2 +1,6 @@
 # Ignore test scripts
 *test.*
+
+# Ignore class files and executables
+*out
+*class
