@@ -11,21 +11,21 @@ import java.util.*;
  * state.
  */
 
-public class BFSolver implements Solver {
-  @Override
-  public State solve (State initial) {
-    Set<State> seen = new HashSet<>();
-    Queue<State> remaining = new ArrayDeque<>();
+public class BFSolver {
+
+  public ZtallocState solve (ZtallocState initial) {
+    Set<ZtallocState> seen = new HashSet<>();
+    Queue<ZtallocState> remaining = new ArrayDeque<>();
     remaining.add(initial);
     seen.add(initial);
 
     while (!remaining.isEmpty()) {
-      State s = remaining.remove();
+      ZtallocState s = remaining.remove();
       if (s.isFinal()) return s;
 
-      for (State n : s.next())
+      for (ZtallocState n : s.next())
         if (!seen.contains(n) && !n.isBad()){
-          if (n.isFinal()) return n;          
+          if (n.isFinal()) return n;
           remaining.add(n);
           seen.add(n);
         }

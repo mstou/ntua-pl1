@@ -1,24 +1,22 @@
 import java.util.*;
 
-public class ZtallocState implements State {
+public class ZtallocState {
   private int L, R;
   private int Ltarget, Rtarget;
   private ZtallocState previous;
 
   public ZtallocState(int Lin, int Rin, int Lout, int Rout, ZtallocState p){
-    L = LeftLimit;
-    R = RightLimit;
+    L = Lin;
+    R = Rin;
     Ltarget = Lout;
     Rtarget = Rout;
     previous = p;
   }
 
-  @Override
   public boolean isFinal(){
     return (L >= Ltarget) && (R <= Rtarget);
   }
 
-  @Override
   public boolean isBad() {
     return L < 0
       || L > 999999
@@ -26,18 +24,24 @@ public class ZtallocState implements State {
       || R > 999999;
   }
 
-  @Override
-  public Collection<State> next(){
-    Collection<State> states = new ArrayList<>();
-    states.add(new ZtallocState(L/2,R/2,this));
-    states.add(new ZtallocState(3*L+1,3*R+1,this));
+  public Collection<ZtallocState> next(){
+    Collection<ZtallocState> states = new ArrayList<>();
+    states.add(new ZtallocState(L/2,R/2,Ltarget,Rtarget,this));
+    states.add(new ZtallocState(3*L+1,3*R+1,Ltarget,Rtarget,this));
 
     return states;
   }
 
-  @Override
-  public State getPrevious(){
+  public ZtallocState getPrevious(){
     return previous;
+  }
+
+  public int getL(){
+    return L;
+  }
+
+  public int getR(){
+    return R;
   }
 
   // Two states are equal if their ends are the same
