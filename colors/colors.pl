@@ -21,6 +21,7 @@ findNewStart(Start,FreqMap,Colors,NewStart,NewFreqMap) :-
       NewFreq is ColorFreq - 1,
       Start_ is Start + 1,
       put_assoc(ColorAtStart,FreqMap,NewFreq,FreqMap_),
+      !,
       findNewStart(Start_,FreqMap_,Colors,NewStart,NewFreqMap)
       ;
       NewStart is Start,
@@ -40,6 +41,7 @@ loop(-1,-1,Colors,FreqMap,ColorsUsed,AllColors,N,BestRes,Answer) :-
   get_assoc(0,Colors,FirstColor),
   put_assoc(FirstColor,FreqMap,1,NewFreqMap),
   NewColorsUsed is ColorsUsed + 1,
+  !,
   loop(0,0,Colors,NewFreqMap,NewColorsUsed,AllColors,N,BestRes,Answer).
 
 % When starting the predicate, we know the best result for all the
@@ -56,6 +58,7 @@ loop(Start,End,Colors,FreqMap,ColorsUsed,AllColors,N,BestRes,Answer) :-
       NewColorsUsed is ColorsUsed + 1,
       put_assoc(NewColor,FreqMap,1,FreqMap_)
   ),
+  !,
   findNewStart(Start,FreqMap_,Colors,NewStart,NewFreqMap),
   (
     NewColorsUsed =:= AllColors ->
@@ -63,6 +66,7 @@ loop(Start,End,Colors,FreqMap,ColorsUsed,AllColors,N,BestRes,Answer) :-
       ;
       NewBestRes is BestRes
   ),
+  !,
   loop(NewStart,NewEnd,Colors,NewFreqMap,NewColorsUsed,AllColors,N,NewBestRes,Answer).
 
 listToAssoc(L,X) :-
@@ -74,6 +78,7 @@ listToAssoc([],_,X,Y) :- X = Y.
 listToAssoc([H|L],N,X,Y) :-
   put_assoc(N,X,H,X1),
   NewIndex is N+1,
+  !,
   listToAssoc(L,NewIndex,X1,Y).
 
 colors(File,Answer) :-
@@ -88,3 +93,27 @@ colors(File,Answer) :-
       ;
       Answer is Ans
   ).
+
+% ==== Run testcases ====
+
+% read_output(File, ExpectedAnswer) :-
+%     open(File, read, Stream),
+%     read_line(Stream, [ExpectedAnswer]).
+%
+% runTestcase(Number) :-
+%   string_concat("testcases/colors.in",Number,InputFile),
+%   string_concat("testcases/colors.out",Number,OutputFile),
+%   statistics(walltime, [ _ | [_]]),
+%   colors(InputFile,Answer),
+%   statistics(walltime, [ _ | [ExecutionTime]]),
+%   read_output(OutputFile,ExpectedAnswer),
+%   (
+%     ExpectedAnswer =:= Answer ->
+%       writeln("+++ OK!")
+%       ;
+%       writeln("--- Testcase Failed!")
+%   ),
+%   write('Execution took '),
+%   write(ExecutionTime),
+%   writeln(' ms.'),
+%   !.
