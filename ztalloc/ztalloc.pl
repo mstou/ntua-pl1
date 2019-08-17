@@ -86,7 +86,7 @@ findNeighbors(L,R,Parent,Neighbors,NewParent) :-
   (
     nodeNotVisited(L1,R1,Parent) ->
       Res1 = [(L1,R1)],
-      put_assoc((L1,R1),Parent,("t",L,R),Parent_)
+      put_assoc((L1,R1),Parent,('t',L,R),Parent_)
       ;
       Res1 = [],
       Parent_ = Parent
@@ -96,7 +96,7 @@ findNeighbors(L,R,Parent,Neighbors,NewParent) :-
   (
     nodeNotVisited(L2,R2,Parent_) ->
       Neighbors = [(L2,R2)|Res1],
-      put_assoc((L2,R2),Parent_,("h",L,R),NewParent)
+      put_assoc((L2,R2),Parent_,('h',L,R),NewParent)
       ;
       Neighbors = Res1,
       NewParent = Parent_
@@ -135,10 +135,10 @@ findPath((L,R),Parent,Acc,Answer) :-
 bfs(Lin,Rin,Lout,Rout,Answer) :-
   (
     isAnswer(Lin,Rin,Lout,Rout) ->
-      Answer = "EMPTY"
+      Answer = 'EMPTY'
       ;
       empty_assoc(X),
-      put_assoc((Lin,Rin),X,("start",-73,-73),Parent),
+      put_assoc((Lin,Rin),X,('start',-73,-73),Parent),
       fifo_empty(Q),
       fifo_insert(Q,(Lin,Rin),Q1),
       bfsLoop(Q1,(Lout,Rout),Parent,Answer)
@@ -146,7 +146,7 @@ bfs(Lin,Rin,Lout,Rout,Answer) :-
 
 bfsLoop(Q,_,_,Answer) :-
   fifo_isEmpty(Q),
-  Answer = "IMPOSSIBLE".
+  Answer = 'IMPOSSIBLE'.
 
 bfsLoop(Q,(Lout,Rout),Parent,Answer) :-
   fifo_pop(Q,(L,R),Q_),
@@ -221,5 +221,4 @@ ztalloc(File,Answer) :-
 %   write(ExecutionTime),
 %   writeln(' ms.'),
 %   !.
-%
 % % =======================================
