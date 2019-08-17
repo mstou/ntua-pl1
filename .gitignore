@@ -4,3 +4,6 @@
 # Ignore class files and executables
 *out
 *class
+
+# Ignore zip files used for uploading solutions to grader
+*.zip
