@@ -59,12 +59,14 @@ insert(trie(X,Map,N), [H|L], T2) :-
     get_assoc(H,Map,Val) ->
       (Tickets,ChildTrie) = Val,
       insert(ChildTrie,L,NewChild),
+      !,
       NewTickets is Tickets + 1,
       put_assoc(H,Map,(NewTickets,NewChild),NewMap)
 
       ;
 
       insert(empty,[H|L],NewChild),
+      !,
       put_assoc(H,Map,(1,NewChild),NewMap)
   ),
   NewN is N+1,
@@ -75,6 +77,7 @@ insertList(T1,[],T) :-
 
 insertList(T1,[H|L],T) :-
   insert(T1,H,T2),
+  !,
   insertList(T2,L,T).
 
 query(empty,_,_,(Tickets,Money)) :-
@@ -91,6 +94,7 @@ query(trie(_,Map,N),[H|L],M,(Tickets,Money)) :-
       (ChildTickets,ChildTrie) = Val,
       NewM is M+1,
       query(ChildTrie,L,NewM,(_,ChildMoney)),
+      !,
       RemainingTickets is N - ChildTickets
       ;
 
@@ -98,7 +102,7 @@ query(trie(_,Map,N),[H|L],M,(Tickets,Money)) :-
       ChildMoney is 0,
       ChildTickets is 0
   ),
-
+  !,
   (
     M =:= 0 ->
       Tickets is ChildTickets
@@ -113,11 +117,14 @@ runQuerries(_,[],Results,Acc) :-
 
 runQuerries(T,[H|L],Results,Acc) :-
   query(T,H,0,(Tickets,Money)),
+  !,
   runQuerries(T,L,Results,[[Tickets,Money]|Acc]).
 
 lottery(File,L) :-
   read_input(File,_,_,_,Tickets,Winning),
+  !,
   insertList(trie(-1,t,0),Tickets,Trie),
+  !,
   runQuerries(Trie,Winning,L,[]),
   !.
 
