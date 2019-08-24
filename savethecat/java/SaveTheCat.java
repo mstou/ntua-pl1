@@ -9,11 +9,6 @@ public class SaveTheCat {
     ArrayList<WaterState> waterPumps = new ArrayList<WaterState>();
     CatState initial = new CatState(0,0,0,null);
 
- // Implement CatState
-// Implement CatBFS
-// Finish savethecat
-// run tests with python
-
     try {
       File input = new File(args[0]);
       BufferedReader br = new BufferedReader(new FileReader(input));
